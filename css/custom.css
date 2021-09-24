@@ -1,0 +1,113 @@
+.calendar__box {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    background: #f9f9f9;
+    /*background-color: #1b1b1b;*/
+}
+
+.calendar__action {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.calendar__navigator {
+    margin-right: 50px;
+    display: flex;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1px solid #1b1b1b;
+}
+
+.calendar__navigator div {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.calendar__navigator div + div {
+    border-left: 1px solid #1b1b1b;
+}
+
+.calendar__daterange {
+    display: flex;
+    align-items: center;
+}
+
+.gstc__chart-timeline{
+    margin-left: 40px !important;
+}
+
+.fc-event-start {
+    /*background-color: yellow !important;*/
+}
+
+.fc-day-span-past {
+    /*background-color: yellow;*/
+}
+
+.fc-day-span-booked {
+    /*background-color: red;*/
+}
+
+.fc-day-checkin {
+    position: relative;
+    /*background: linear-gradient(to left top, transparent 50%, #e74c3c 50%);*/
+
+}
+
+.fc-day-checkin::before {
+    position: absolute;
+    content: "";
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 30%;
+    /*background-color: #e74c3c;*/
+    background-color: rgb(231, 76, 60);
+    border-radius: 500px 0 0 500px;
+
+    /*top: 0;*/
+    /*right: 0;*/
+    /*width: 0;*/
+    /*height: 0;*/
+    /*border-bottom: 62px solid #e74c3c; !* cell height *!*/
+    /*border-left: 50px solid transparent;*/
+}
+
+.fc-day-checkout {
+    position: relative;
+    /*background: linear-gradient(to left top, transparent 50%, #e74c3c 50%);*/
+}
+
+.fc-day-checkout::after {
+    position: absolute;
+    content: "";
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 30%;
+    /*background-color: #e74c3c;*/
+    border-radius: 0 500px 500px 0;
+    background-color: rgb(231, 76, 60);
+
+    /*top: 0;*/
+    /*left: 0;*/
+    /*width: 0;*/
+    /*height: 0;*/
+    /*border-top: 62px solid #e74c3c; !* cell height *!*/
+    /*border-right: 50px solid transparent;*/
+}
+
+
+.rental-calendar-block {
+    padding-top: 100px;
+    padding-bottom: 100px;
+}
+
+.rental-calendar-wrapper {
+    margin-bottom: 50px;
+}
