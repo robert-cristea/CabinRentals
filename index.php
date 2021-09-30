@@ -18,8 +18,6 @@ if (isset($_GET['start']) && !empty($_GET['start'])) {
 
 $end = date("Y-m-d", strtotime("+1 month", strtotime($start)));
 
-echo $start;
-echo $end;
 
 $rentals = $rentalDao->getAll();
 foreach ($rentals as $rental) {
@@ -31,21 +29,19 @@ foreach ($rentals as $rental) {
 
 $reservations = $reservationDao->getReservationByDateRange($start, $end);
 foreach ($reservations as $reservation) {
-    if (date($reservation->getStartDate()) < $start) {
-        $reservation->setStartDate($start);
-    }
-    if (date($reservation->getEndDate()) > $end) {
-        $reservation->setEndDate($end);
-    }
-
-    // change endDate for calendar range
-    $EndDate = date("Y-m-d", strtotime("-1 day", strtotime($reservation->getEndDate())));
+    // modify startdate and enddate to fit in a month range
+//    if (date($reservation->getStartDate()) < $start) {
+//        $reservation->setStartDate($start);
+//    }
+//    if (date($reservation->getEndDate()) > $end) {
+//        $reservation->setEndDate($end);
+//    }
 
     $itemsData[] = [
         "PropertyID" => $reservation->getPropertyId(),
         "CabinName" => $reservation->getCabinName(),
         "StartDate" => $reservation->getStartDate(),
-        "EndDate" => $EndDate,
+        "EndDate" => $reservation->getEndDate(),
     ];
 }
 
@@ -109,15 +105,31 @@ foreach ($reservations as $reservation) {
 <script type="module">
     import GSTC from './plugins/gantt-schedule-timeline-calendar/dist/gstc.esm.min.js';
 
+    const licenseKey = '====BEGIN LICENSE KEY====\\nZiLPlk9/lrQSTNjRdRyb0E2EJbDtTCSa3V0wEDHBaY9pES+yarblynJMNMkMjcaFv1Bid5Vgmlq5luov3kD+VWim592U/dXePpwFFsEhvLceTepQ1MftH66F8zmKaxi2KHYGFlOeCWexKo/aas8KaTW99xEYFsJT8zvfWUMywLgj4pOi932E0AZQYhispPVYcljpzkMkoQnSHZwKOZ30al98yEvHwXNNhv0Qmcs1grC9nset3+AIR72WPHdiKQGtOhfPD5Exnso3tc2DI/zX50KcUMQtOd1qqe5TWM1F0rY32UiSJNB/ChOtFD5HkGaEeuGnmEQ6R742cJhqwnXn5Q==||U2FsdGVkX18Jb05PgcQmNIztN9nNkW+U0EiwALnJhm1AqywQCetmDaTQ/1IwhxMsIesRuiV3eChv9CBH5ld6S3WqN41pfRaaj0lddXzZc+E=\\nP/yHzbVoBdOOiAANQEw6KRSvQsWFNgpZ2TVMhEMEJ2LVWW1gdVFqOS+7c7QdjEyi+QPDHdpdijcKWkh3WjC3gDix3lfJeHw1DoDl9RVpyO/YpbWf0dCj6ZOL7SvArNAOuNvLfdySbHtCorJGy6Pm/OovAf9xbR4+99XOskj4aUiazx4xvRwh1TU/epfkKhBSek2JbDqaI1QH+FpA8jZNDXc5C86PYTPYnBCydAKAwVTInQ5rEQhlGVyshnJz/07qLCwf9rMLkAxdO1/SHuUYHYG03sruImg0YdXjGaBY4q4a4ojsv5ZSIfhD0ezysuCU3TwgF2eBAJ+lIy35OjL8Zw==\\n====END LICENSE KEY===='
+
+    let rowsFromDB = <?php echo json_encode($rowData); ?>;
+    let itemsFromDB = <?php echo json_encode($itemsData);?>;
+    let rangeFrom = '<?php  echo $start;?>';
+    let rangeTo = '<?php echo $end;?>';
+
+
     function onRowClick(row) {
         window.row = GSTC.api.sourceID(row.id);
         window.location.href = "/cabinrentals/rental.php?id=" + GSTC.api.sourceID(row.id);
     }
 
-    let rowsFromDB = <?php echo json_encode($rowData); ?>;
-    let itemsFromDB = <?php echo json_encode($itemsData);?>;
+    const generateCheckinDatetime = (date) => {
+        let dt = new Date(date)
+        dt.setHours(16)
+        return dt
+    }
 
-    console.log("itemsFromDB", itemsFromDB)
+    const generateCheckoutDatetime = (date) => {
+        let dt = new Date(date)
+        dt.setHours(9)
+        return dt
+    }
+
     const rowsData = rowsFromDB.map((obj) => ({
         id: obj.PropertyID,
         label({row, vido}) {
@@ -133,13 +145,14 @@ foreach ($reservations as $reservation) {
         // }
     }))
 
+
     const itemsdata = itemsFromDB.map((obj, index) => ({
         id: index + 1,
         label: obj.CabinName,
         rowId: obj.PropertyID,
         time: {
-            start: GSTC.api.date(obj.StartDate).startOf('day').valueOf(),
-            end: GSTC.api.date(obj.EndDate).endOf('day').valueOf(),
+            start: GSTC.api.date(generateCheckinDatetime(obj.StartDate)),
+            end: GSTC.api.date(generateCheckoutDatetime(obj.EndDate)),
         },
     }))
 
@@ -148,9 +161,6 @@ foreach ($reservations as $reservation) {
             id: 'id',
             label: 'ID',
             data: ({row, vido}) => vido.html`<div>${GSTC.api.sourceID(row.id)}</div>`,
-            // data: ({row, vido}) =>
-            //     vido.html`<div class="row-content-column" @click=${() =>
-            //         onRowClick(row)}>${GSTC.api.sourceID(row.id)}</div>`, // show original id (not internal GSTCID)
             sortable: ({row}) => Number(GSTC.api.sourceID(row.id)), // sort by id converted to number
             width: 80,
             header: {
@@ -169,9 +179,14 @@ foreach ($reservations as $reservation) {
         },
     ];
 
+    const dateRange = {
+        leftGlobal: GSTC.api.date().startOf("month").valueOf(),
+        from: GSTC.api.date(rangeFrom),
+        to: GSTC.api.date(rangeTo).endOf('day'),
+    }
+
     const config = {
-        licenseKey:
-            '====BEGIN LICENSE KEY====\\nZiLPlk9/lrQSTNjRdRyb0E2EJbDtTCSa3V0wEDHBaY9pES+yarblynJMNMkMjcaFv1Bid5Vgmlq5luov3kD+VWim592U/dXePpwFFsEhvLceTepQ1MftH66F8zmKaxi2KHYGFlOeCWexKo/aas8KaTW99xEYFsJT8zvfWUMywLgj4pOi932E0AZQYhispPVYcljpzkMkoQnSHZwKOZ30al98yEvHwXNNhv0Qmcs1grC9nset3+AIR72WPHdiKQGtOhfPD5Exnso3tc2DI/zX50KcUMQtOd1qqe5TWM1F0rY32UiSJNB/ChOtFD5HkGaEeuGnmEQ6R742cJhqwnXn5Q==||U2FsdGVkX18Jb05PgcQmNIztN9nNkW+U0EiwALnJhm1AqywQCetmDaTQ/1IwhxMsIesRuiV3eChv9CBH5ld6S3WqN41pfRaaj0lddXzZc+E=\\nP/yHzbVoBdOOiAANQEw6KRSvQsWFNgpZ2TVMhEMEJ2LVWW1gdVFqOS+7c7QdjEyi+QPDHdpdijcKWkh3WjC3gDix3lfJeHw1DoDl9RVpyO/YpbWf0dCj6ZOL7SvArNAOuNvLfdySbHtCorJGy6Pm/OovAf9xbR4+99XOskj4aUiazx4xvRwh1TU/epfkKhBSek2JbDqaI1QH+FpA8jZNDXc5C86PYTPYnBCydAKAwVTInQ5rEQhlGVyshnJz/07qLCwf9rMLkAxdO1/SHuUYHYG03sruImg0YdXjGaBY4q4a4ojsv5ZSIfhD0ezysuCU3TwgF2eBAJ+lIy35OjL8Zw==\\n====END LICENSE KEY====',
+        licenseKey,
         list: {
             columns: {
                 data: GSTC.api.fromArray(columnsData),
@@ -180,12 +195,18 @@ foreach ($reservations as $reservation) {
         },
         chart: {
             items: GSTC.api.fromArray(itemsdata),
+            time: {
+                ...dateRange,
+                calculatedZoomMode: true,
+                onLevelDates: [({dates}) => dates],
+                onCurrentViewLevelDates: [({dates}) => dates],
+                onDate: [({date}) => date],
+            },
         },
     };
 
     const state = GSTC.api.stateFromConfig(config);
 
-    // @ts-ignore
     window.state = state;
 
     const app = GSTC({
@@ -193,28 +214,18 @@ foreach ($reservations as $reservation) {
         state,
     });
 
-    // @ts-ignore
     window.gstc = app;
 
-</script>
-<script type="text/javascript">
-    // $(document).ready(function () {
-    //     $("#loadBtn").click(function () {
-    //         $.ajax({
-    //             method: "GET",
-    //             url: "php/get-rentals.php",
-    //             success: function (result) {
-    //                 console.log("result", result);
-    //                 state.update('config.chart.items.' + itemId + '.label', (oldLabel) => {
-    //                     return 'new label';
-    //                 });
-    //             },
-    //             failure: function (error) {
-    //                 console.log("error", error)
-    //             }
-    //         })
-    //     })
-    // })
+    // set height to max-content
+    state.update("config.innerHeight", (height) => {
+        let rowsCount = rowsFromDB.length
+        let headerHeight = 72
+        let horizontalScrollerHeight = 20
+        let rowHeight = 40
+        console.log("rowsFromDB", rowsCount, headerHeight + horizontalScrollerHeight + rowsCount * rowHeight, rowsFromDB)
+        return headerHeight + horizontalScrollerHeight + rowsCount * rowHeight;
+    });
+
 
 </script>
 </body>
