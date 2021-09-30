@@ -35,9 +35,9 @@ foreach ($array as $reservation) {
 <head>
     <meta charset="utf8"/>
     <title>Cabin Rentals</title>
-    <link rel="stylesheet" href="./plugins/bootstrap-4.3.1/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="./plugins/fontawesome-4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href='./plugins/fullcalendar/main.css'/>
+    <link rel="stylesheet" href="./assets/bootstrap-4.3.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="./assets/fontawesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href='./assets/fullcalendar/main.css'/>
     <link rel="stylesheet" href="./css/custom.css"/>
 </head>
 <body>
@@ -85,8 +85,8 @@ foreach ($array as $reservation) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 
-<script src="./plugins/bootstrap-4.3.1/js/bootstrap.min.js"></script>
-<script src='./plugins/fullcalendar/main.js'></script>
+<script src="./assets/bootstrap-4.3.1/js/bootstrap.min.js"></script>
+<script src='./assets/fullcalendar/main.js'></script>
 <script type="text/javascript">
     $(document).ready(function () {
         let rental = <?php echo json_encode($rental); ?>;

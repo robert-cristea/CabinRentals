@@ -53,10 +53,9 @@ foreach ($reservations as $reservation) {
 <head>
     <meta charset="utf8"/>
     <title>Cabin Rentals</title>
-    <link rel="stylesheet" href="./plugins/bootstrap-4.3.1/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="./plugins/fontawesome-4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="./plugins/gantt-schedule-timeline-calendar/dist/style.css"/>
-    <link rel="stylesheet" href="./plugins/gantt-schedule-timeline-calendar/reset.css"/>
+    <link rel="stylesheet" href="./assets/bootstrap-4.3.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="./assets/fontawesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./assets/gantt-schedule-timeline-calendar/dist/style.css"/>
     <link rel="stylesheet" href="./css/custom.css"/>
 </head>
 <body>
@@ -100,10 +99,18 @@ foreach ($reservations as $reservation) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"></script>
-<script src="./plugins/bootstrap-4.3.1/js/bootstrap.min.js"></script>
+<script src="./assets/bootstrap-4.3.1/js/bootstrap.min.js"></script>
 
 <script type="module">
-    import GSTC from './plugins/gantt-schedule-timeline-calendar/dist/gstc.esm.min.js';
+    import GSTC from './assets/gantt-schedule-timeline-calendar/dist/gstc.esm.min.js';
+    import {Plugin as TimelinePointer} from './assets/gantt-schedule-timeline-calendar/dist/plugins/timeline-pointer.esm.min.js';
+    import {Plugin as Selection} from './assets/gantt-schedule-timeline-calendar/dist/plugins/selection.esm.min.js';
+    import {Plugin as ItemMovement} from './assets/gantt-schedule-timeline-calendar/dist/plugins/item-movement.esm.min.js';
+    import {Plugin as ItemResizing} from './assets/gantt-schedule-timeline-calendar/dist/plugins/item-resizing.esm.min.js';
+    import {Plugin as CalendarScroll} from './assets/gantt-schedule-timeline-calendar/dist/plugins/calendar-scroll.esm.min.js';
+    import {Plugin as HighlightWeekends} from './assets/gantt-schedule-timeline-calendar/dist/plugins/highlight-weekends.esm.min.js';
+    import {Plugin as DependencyLines} from './assets/gantt-schedule-timeline-calendar/dist/plugins/dependency-lines.esm.min.js';
+    import {Plugin as ItemTypes} from './assets/gantt-schedule-timeline-calendar/dist/plugins/item-types.esm.min.js';
 
     const licenseKey = '====BEGIN LICENSE KEY====\\nZiLPlk9/lrQSTNjRdRyb0E2EJbDtTCSa3V0wEDHBaY9pES+yarblynJMNMkMjcaFv1Bid5Vgmlq5luov3kD+VWim592U/dXePpwFFsEhvLceTepQ1MftH66F8zmKaxi2KHYGFlOeCWexKo/aas8KaTW99xEYFsJT8zvfWUMywLgj4pOi932E0AZQYhispPVYcljpzkMkoQnSHZwKOZ30al98yEvHwXNNhv0Qmcs1grC9nset3+AIR72WPHdiKQGtOhfPD5Exnso3tc2DI/zX50KcUMQtOd1qqe5TWM1F0rY32UiSJNB/ChOtFD5HkGaEeuGnmEQ6R742cJhqwnXn5Q==||U2FsdGVkX18Jb05PgcQmNIztN9nNkW+U0EiwALnJhm1AqywQCetmDaTQ/1IwhxMsIesRuiV3eChv9CBH5ld6S3WqN41pfRaaj0lddXzZc+E=\\nP/yHzbVoBdOOiAANQEw6KRSvQsWFNgpZ2TVMhEMEJ2LVWW1gdVFqOS+7c7QdjEyi+QPDHdpdijcKWkh3WjC3gDix3lfJeHw1DoDl9RVpyO/YpbWf0dCj6ZOL7SvArNAOuNvLfdySbHtCorJGy6Pm/OovAf9xbR4+99XOskj4aUiazx4xvRwh1TU/epfkKhBSek2JbDqaI1QH+FpA8jZNDXc5C86PYTPYnBCydAKAwVTInQ5rEQhlGVyshnJz/07qLCwf9rMLkAxdO1/SHuUYHYG03sruImg0YdXjGaBY4q4a4ojsv5ZSIfhD0ezysuCU3TwgF2eBAJ+lIy35OjL8Zw==\\n====END LICENSE KEY===='
 
@@ -113,18 +120,40 @@ foreach ($reservations as $reservation) {
     let rangeTo = '<?php echo $end;?>';
 
 
+    function canSelectItem(item) {
+        if (typeof item.canSelect === 'boolean') return item.canSelect;
+        return !doNotSelectThisItems.includes(item.id);
+    }
+
+    function preventSelection(selecting) {
+        return {
+            'chart-timeline-grid-row-cell': selecting['chart-timeline-grid-row-cell'].filter(
+                (cell) => !doNotSelectThisCells.includes(cell.time.leftGlobalDate.format('YYYY-MM-DD'))
+            ),
+            'chart-timeline-items-row-item': selecting['chart-timeline-items-row-item'].filter((item) => canSelectItem(item)),
+        };
+    }
+
+    function addCellBackground({time, row, vido}) {
+        const isSelectable = !doNotSelectThisCells.includes(time.leftGlobalDate.format('YYYY-MM-DD'));
+        console.log('ceell', time.leftGlobalDate.format('YYYY-MM-DD'), isSelectable);
+        return isSelectable
+            ? vido.html`<div class="selectable-cell" style="width:100%;height:100%;"></div>`
+            : vido.html`<div class="not-selectable-cell" style="width:100%;height:100%;">🚫</div>`;
+    }
+
     function onRowClick(row) {
         window.row = GSTC.api.sourceID(row.id);
         window.location.href = "/cabinrentals/rental.php?id=" + GSTC.api.sourceID(row.id);
     }
 
-    const generateCheckinDatetime = (date) => {
+    function generateCheckinDatetime(date) {
         let dt = new Date(date)
         dt.setHours(16)
         return dt
     }
 
-    const generateCheckoutDatetime = (date) => {
+    function generateCheckoutDatetime(date) {
         let dt = new Date(date)
         dt.setHours(9)
         return dt
