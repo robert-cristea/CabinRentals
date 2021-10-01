@@ -10,13 +10,21 @@ $reservationDao = new ReservationDAO();
 $rowData = array();
 $itemsData = array();
 
+$start = date("Y-m-d");
+$duration = "month";
 if (isset($_GET['start']) && !empty($_GET['start'])) {
     $start = date($_GET['start']);
-} else {
-    $start = date("Y-m-d");
 }
-
-$end = date("Y-m-d", strtotime("+1 month", strtotime($start)));
+if (isset($_GET['duration']) && !empty($_GET['duration'])) {
+    if ($_GET['duration'] === "month" || $_GET['duration'] === "week") {
+        $duration = $_GET['duration'];
+    }
+}
+if ($duration === "week") {
+    $end = date("Y-m-d", strtotime("+1 week", strtotime($start)));
+} else {
+    $end = date("Y-m-d", strtotime("+1 month", strtotime($start)));
+}
 
 
 $rentals = $rentalDao->getAll();
@@ -29,14 +37,6 @@ foreach ($rentals as $rental) {
 
 $reservations = $reservationDao->getReservationByDateRange($start, $end);
 foreach ($reservations as $reservation) {
-    // modify startdate and enddate to fit in a month range
-//    if (date($reservation->getStartDate()) < $start) {
-//        $reservation->setStartDate($start);
-//    }
-//    if (date($reservation->getEndDate()) > $end) {
-//        $reservation->setEndDate($end);
-//    }
-
     $itemsData[] = [
         "PropertyID" => $reservation->getPropertyId(),
         "CabinName" => $reservation->getCabinName(),
@@ -67,28 +67,20 @@ foreach ($reservations as $reservation) {
                     <i class="fa fa-calendar"></i>
                 </div>
                 <div>
-                    <a href="/cabinrentals?start=<?php echo date("Y-m-d", strtotime("-1 month", strtotime($start))); ?>">
+                    <a id="prevMonthLink" href="/cabinrentals?start=">
                         <i class="fa fa-chevron-left"></i>
                     </a>
                 </div>
-                <div id="prevMonthBtn">
-                    <a href="/cabinrentals?start=<?php echo date("Y-m-d", strtotime("+1 month", strtotime($start))); ?>">
+                <div>
+                    <a id="nextMonthLink" href="/cabinrentals?start=">
                         <i class="fa fa-chevron-right"></i>
                     </a>
                 </div>
             </div>
             <div class="calendar__daterange">
-                <span>
-                     <?php
-                     echo date("d M Y", strtotime($start));
-                     ?>
-                </span>
+                <span id="rangeStartDate"></span>
                 ~
-                <span>
-                     <?php
-                     echo date("d M Y", strtotime($end));
-                     ?>
-                </span>
+                <span id="rangeEndDate"></span>
             </div>
         </div>
         <div id="gstc"></div>
@@ -116,30 +108,58 @@ foreach ($reservations as $reservation) {
 
     let rowsFromDB = <?php echo json_encode($rowData); ?>;
     let itemsFromDB = <?php echo json_encode($itemsData);?>;
-    let rangeFrom = '<?php  echo $start;?>';
-    let rangeTo = '<?php echo $end;?>';
+    let currentStartDate = '<?php  echo $start;?>';
+    let prevLinkDate = getPrevLinkDate();
+    let nextLinkDate = getNextLinkDate();
 
+    renderNavigateLinks()
 
-    function canSelectItem(item) {
-        if (typeof item.canSelect === 'boolean') return item.canSelect;
-        return !doNotSelectThisItems.includes(item.id);
+    function renderNavigateLinks() {
+        if (!isMobileView()) {
+            document.getElementById("prevMonthLink").href = `/cabinrentals?start=${prevLinkDate}`
+            document.getElementById("nextMonthLink").href = `/cabinrentals?start=${nextLinkDate}`
+        } else {
+            document.getElementById("prevMonthLink").href = `/cabinrentals?start=${prevLinkDate}&duration=week`
+            document.getElementById("nextMonthLink").href = `/cabinrentals?start=${nextLinkDate}&duration=week`
+        }
+        document.getElementById("rangeStartDate").innerText = currentStartDate
+        document.getElementById("rangeEndDate").innerText = nextLinkDate
     }
 
-    function preventSelection(selecting) {
-        return {
-            'chart-timeline-grid-row-cell': selecting['chart-timeline-grid-row-cell'].filter(
-                (cell) => !doNotSelectThisCells.includes(cell.time.leftGlobalDate.format('YYYY-MM-DD'))
-            ),
-            'chart-timeline-items-row-item': selecting['chart-timeline-items-row-item'].filter((item) => canSelectItem(item)),
-        };
+    function getPrevLinkDate() {
+        var dt = new Date(currentStartDate);
+        console.log("getPrevLinkDate", dt)
+
+        let duration = getNavigationDuration()
+        if (duration === "week") {
+            dt.setDate(dt.getDate() - 7);
+        } else {
+            dt.setMonth(dt.getMonth() - 1);
+        }
+        console.log("getPrevLinkDate", dt.toISOString().split('T')[0])
+        return dt.toISOString().split('T')[0];
     }
 
-    function addCellBackground({time, row, vido}) {
-        const isSelectable = !doNotSelectThisCells.includes(time.leftGlobalDate.format('YYYY-MM-DD'));
-        console.log('ceell', time.leftGlobalDate.format('YYYY-MM-DD'), isSelectable);
-        return isSelectable
-            ? vido.html`<div class="selectable-cell" style="width:100%;height:100%;"></div>`
-            : vido.html`<div class="not-selectable-cell" style="width:100%;height:100%;">🚫</div>`;
+    function getNextLinkDate() {
+        var dt = new Date(currentStartDate);
+        console.log("getNextLinkDate", dt)
+
+        let duration = getNavigationDuration()
+        if (duration === "week") {
+            dt.setDate(dt.getDate() + 7);
+        } else {
+            dt.setMonth(dt.getMonth() + 1);
+        }
+        console.log("getNextLinkDate", dt.toISOString().split('T')[0])
+        return dt.toISOString().split('T')[0];
+    }
+
+    function getNavigationDuration() {
+        return isMobileView() ? "week" : "month"
+    }
+
+    function isMobileView() {
+        return window.innerWidth < 700;
     }
 
     function onRowClick(row) {
@@ -177,7 +197,7 @@ foreach ($reservations as $reservation) {
 
     const itemsdata = itemsFromDB.map((obj, index) => ({
         id: index + 1,
-        label: obj.CabinName,
+        label: isMobileView() ? '' : obj.CabinName,
         rowId: obj.PropertyID,
         time: {
             start: GSTC.api.date(generateCheckinDatetime(obj.StartDate)),
@@ -210,8 +230,8 @@ foreach ($reservations as $reservation) {
 
     const dateRange = {
         leftGlobal: GSTC.api.date().startOf("month").valueOf(),
-        from: GSTC.api.date(rangeFrom),
-        to: GSTC.api.date(rangeTo).endOf('day'),
+        from: GSTC.api.date(currentStartDate),
+        to: GSTC.api.date(nextLinkDate).startOf('day'),
     }
 
     const config = {

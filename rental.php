@@ -48,32 +48,32 @@ foreach ($array as $reservation) {
         <h5><?php echo $rental->getPropertyTitle(); ?></h5>
 
         <div class="row">
-            <div class="col-lg-6 col-sm-12">
+            <div class="col-lg-4 col-sm-12">
                 <div id="rental-calendar1" class="rental-calendar-wrapper">
 
                 </div>
             </div>
-            <div class="col-lg-6 col-sm-12">
+            <div class="col-lg-4 col-sm-12">
                 <div id="rental-calendar2" class="rental-calendar-wrapper">
 
                 </div>
             </div>
-            <div class="col-lg-6 col-sm-12">
+            <div class="col-lg-4 col-sm-12">
                 <div id="rental-calendar3" class="rental-calendar-wrapper">
 
                 </div>
             </div>
-            <div class="col-lg-6 col-sm-12">
+            <div class="col-lg-4 col-sm-12">
                 <div id="rental-calendar4" class="rental-calendar-wrapper">
 
                 </div>
             </div>
-            <div class="col-lg-6 col-sm-12">
+            <div class="col-lg-4 col-sm-12">
                 <div id="rental-calendar5" class="rental-calendar-wrapper">
 
                 </div>
             </div>
-            <div class="col-lg-6 col-sm-12">
+            <div class="col-lg-4 col-sm-12">
                 <div id="rental-calendar6" class="rental-calendar-wrapper">
 
                 </div>
@@ -121,6 +121,8 @@ foreach ($array as $reservation) {
                 showNonCurrentDates: false,
                 eventBackgroundColor: '#e74c3c',
                 events: events,
+                // aspectRatio: 2,
+                contentHeight: "auto",
                 dayCellContent: function (info, create) {
                     console.log("info", info)
 
