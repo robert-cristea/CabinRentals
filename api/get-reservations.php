@@ -12,22 +12,26 @@ $rowData = array();
 $itemsData = array();
 
 $start = date("Y-m-d");
+$end = date("Y-m-d", strtotime("+1 month", strtotime($start)));
 $duration = "month";
 
 if (isset($_GET['start']) && !empty($_GET['start'])) {
     $start = date($_GET['start']);
 }
-if (isset($_GET['duration']) && !empty($_GET['duration'])) {
-    if ($_GET['duration'] === "month" || $_GET['duration'] === "week") {
-        $duration = $_GET['duration'];
-    }
+if (isset($_GET['start']) && !empty($_GET['start'])) {
+    $end = date($_GET['end']);
 }
+//if (isset($_GET['duration']) && !empty($_GET['duration'])) {
+//    if ($_GET['duration'] === "month" || $_GET['duration'] === "week") {
+//        $duration = $_GET['duration'];
+//    }
+//}
 
-if ($duration === "week") {
-    $end = date("Y-m-d", strtotime("+1 week", strtotime($start)));
-} else {
-    $end = date("Y-m-d", strtotime("+1 month", strtotime($start)));
-}
+//if ($duration === "week") {
+//    $end = date("Y-m-d", strtotime("+1 week", strtotime($start)));
+//} else {
+//    $end = date("Y-m-d", strtotime("+1 month", strtotime($start)));
+//}
 
 
 $reservations = $reservationDao->getReservationByDateRange($start, $end);

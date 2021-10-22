@@ -1,8 +1,7 @@
 /* eslint-disable no-console */
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import moment from "moment";
-import faker from "faker";
-
 import Timeline, {
   TimelineMarkers,
   TodayMarker,
@@ -13,18 +12,18 @@ import Timeline, {
   TimelineHeaders,
   DateHeader,
 } from "react-calendar-timeline";
-
+import faker from "faker";
 import generateFakeData from "./generate-fake-data";
 import axios from "axios";
 
-var minTime = moment()
-  .add(-6, "months")
+let minTime = moment()
+  .add(-3, "months")
   .valueOf();
-var maxTime = moment()
-  .add(6, "months")
+let maxTime = moment()
+  .add(3, "months")
   .valueOf();
 
-var keys = {
+let keys = {
   groupIdKey: "id",
   groupTitleKey: "title",
   groupRightTitleKey: "rightTitle",
@@ -37,6 +36,14 @@ var keys = {
 };
 
 const API_URL = "http://localhost";
+const rentalDetailBaseURL = "http://localhost/cabinrentals/rental.php";
+const defaultTimeStartValue = moment()
+  .startOf("day")
+  .toDate();
+const defaultTimeEndValue = moment()
+  .startOf("day")
+  .add(1, "month")
+  .toDate();
 
 export default function App() {
   const [groups, setGroups] = useState([]);
@@ -44,31 +51,28 @@ export default function App() {
   const [defaultTimeStart, setDefaultTimeStart] = useState(null);
   const [defaultTimeEnd, setDefaultTimeEnd] = useState(null);
   const [format, setFormat] = useState(false);
-  const [showHeaders, setShowHeaders] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  //   const location = useLocation();
 
   useEffect(() => {
-    const { groups, items } = generateFakeData();
-
-    console.log("generateFakeData", groups, items);
-    setGroups(groups);
-    setItems(items);
-    const defaultTimeStart = moment()
-      .startOf("day")
-      .toDate();
-    const defaultTimeEnd = moment()
-      .startOf("day")
-      .add(1, "day")
-      .toDate();
-    setDefaultTimeStart(defaultTimeStart);
-    setDefaultTimeEnd(defaultTimeEnd);
-  }, []);
-
-  useEffect(() => {
+    setDefaultTimeStart(defaultTimeStartValue);
+    setDefaultTimeEnd(defaultTimeEndValue);
     fetchRentals();
     fetchReservation();
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    let defaultTimeStart = params.get("start");
+    let defaultTimeEnd = params.get("end");
+    console.log(`location`, defaultTimeStart, defaultTimeEnd);
+
+    // fetchReservation();
+  }, [window.location]);
+
   const fetchRentals = async () => {
+    setIsLoading(true);
     try {
       const { data: rentals } = await axios.get(
         `${API_URL}/cabinrentals/api/get-rentals.php`
@@ -84,36 +88,26 @@ export default function App() {
     } catch (error) {
       console.log(`fetchRentals:error`, error);
     }
+    setIsLoading(false);
   };
 
-  function generateCheckinDatetime(date) {
-    // moment(date).add(16, "h");
-    // console.log(`generateCheckinDatetime`, moment(date).add(16, "h"));
-    return moment(date).add(16, "h");
-  }
-
-  function generateCheckoutDatetime(date) {
-    // moment(date).add(9, "h");
-    return moment(date).add(9, "h");
-  }
-
-  const fetchReservation = async () => {
+  const fetchReservation = async (startDate, endDate) => {
+    setIsLoading(true);
     try {
+      if (!startDate || !endDate) {
+        startDate = moment()
+          .startOf("day")
+          .add(-1, "month")
+          .format();
+        endDate = moment()
+          .startOf("day")
+          .add(2, "month")
+          .format();
+      }
       const { data: reservations } = await axios.get(
-        `${API_URL}/cabinrentals/api/get-reservations.php`
+        `${API_URL}/cabinrentals/api/get-reservations.php?start=${startDate}&end=${endDate}`
       );
       console.log(`fetchReservation:data`, reservations);
-      const daysInPast = 30;
-      const startDate =
-        faker.date.recent(daysInPast).valueOf() +
-        daysInPast * 0.3 * 86400 * 1000;
-      const startValue =
-        Math.floor(moment(startDate).valueOf() / 10000000) * 10000000;
-      const endValue = moment(
-        startDate + faker.random.number({ min: 2, max: 20 }) * 15 * 60 * 1000
-      ).valueOf();
-
-      console.log(`startDate`, startDate, startValue, endValue);
 
       let items = reservations.map((reservation, index) => ({
         id: index + "",
@@ -125,74 +119,27 @@ export default function App() {
           "data-tip": reservation.CabinName,
         },
       }));
+      console.log(`fetchReservation:items`, items);
       setItems(items);
     } catch (error) {
       console.log(`fetchReservation:error`, error);
     }
+    setIsLoading(false);
   };
 
-  const handleClick = () => {
-    setFormat(true);
+  const generateCheckinDatetime = (date) => {
+    // return (
+    //   Math.floor(
+    //     moment(date)
+    //       .add(16, "h")
+    //       .valueOf() / 10000000
+    //   ) * 10000000
+    // );
+    return moment(date).add(16, "h");
   };
 
-  const handleCanvasClick = (groupId, time) => {
-    console.log("Canvas clicked", groupId, moment(time).format());
-  };
-
-  const handleCanvasDoubleClick = (groupId, time) => {
-    console.log("Canvas double clicked", groupId, moment(time).format());
-  };
-
-  const handleCanvasContextMenu = (group, time) => {
-    console.log("Canvas context menu", group, moment(time).format());
-  };
-
-  const handleItemClick = (itemId, _, time) => {
-    console.log("Clicked: " + itemId, moment(time).format());
-  };
-
-  const handleItemSelect = (itemId, _, time) => {
-    console.log("Selected: " + itemId, moment(time).format());
-  };
-
-  const handleItemDoubleClick = (itemId, _, time) => {
-    console.log("Double Click: " + itemId, moment(time).format());
-  };
-
-  const handleItemContextMenu = (itemId, _, time) => {
-    console.log("Context Menu: " + itemId, moment(time).format());
-  };
-
-  const handleItemMove = (itemId, dragTime, newGroupOrder) => {
-    const group = groups[newGroupOrder];
-    setItems(
-      items.map((item) =>
-        item.id === itemId
-          ? Object.assign({}, item, {
-              start: dragTime,
-              end: dragTime + (item.end - item.start),
-              group: group.id,
-            })
-          : item
-      )
-    );
-
-    console.log("Moved", itemId, dragTime, newGroupOrder);
-  };
-
-  const handleItemResize = (itemId, time, edge) => {
-    setItems(
-      items.map((item) =>
-        item.id === itemId
-          ? Object.assign({}, item, {
-              start: edge === "left" ? time : item.start,
-              end: edge === "left" ? item.end : time,
-            })
-          : item
-      )
-    );
-
-    console.log("Resized", itemId, time, edge);
+  const generateCheckoutDatetime = (date) => {
+    return moment(date).add(9, "h");
   };
 
   // this limits the timeline to -6 months ... +6 months
@@ -201,6 +148,14 @@ export default function App() {
     visibleTimeEnd,
     updateScrollCanvas
   ) => {
+    console.log(
+      `handleTimeChange:visibleTimeStart,visibleTimeEnd`,
+      visibleTimeStart,
+      visibleTimeEnd,
+      moment(visibleTimeStart),
+      moment(visibleTimeEnd)
+    );
+
     if (visibleTimeStart < minTime && visibleTimeEnd > maxTime) {
       updateScrollCanvas(minTime, maxTime);
     } else if (visibleTimeStart < minTime) {
@@ -218,26 +173,56 @@ export default function App() {
     }
   };
 
-  const moveResizeValidator = (action, item, time) => {
-    if (time < new Date().getTime()) {
-      var newTime =
-        Math.ceil(new Date().getTime() / (15 * 60 * 1000)) * (15 * 60 * 1000);
-      return newTime;
-    }
-
-    return time;
+  const handleBoundChange = (canvasTimeStart, canvasTimeEnd) => {
+    console.log(
+      `handleBoundChange`,
+      canvasTimeStart,
+      canvasTimeEnd,
+      moment(canvasTimeEnd)
+    );
+    fetchReservation(
+      moment(canvasTimeStart).format(),
+      moment(canvasTimeEnd).format()
+    );
   };
 
-  const handleClickChangeHeaders = () => {
-    setShowHeaders(!showHeaders);
+  const itemRenderer = ({
+    item,
+    timelineContext,
+    itemContext,
+    getItemProps,
+    getResizeProps,
+  }) => {
+    const { left: leftResizeProps, right: rightResizeProps } = getResizeProps();
+    return (
+      <div {...getItemProps()}>
+        {itemContext.useResizeHandle ? <div {...leftResizeProps} /> : null}
+
+        <div
+          style={{
+            height: itemContext.dimensions.height,
+            overflow: "hidden",
+            paddingLeft: 3,
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          <a target="_blank" href={`${rentalDetailBaseURL}?id=${item.group}`}>
+            {itemContext.title}
+          </a>
+        </div>
+
+        {itemContext.useResizeHandle ? <div {...rightResizeProps} /> : null}
+      </div>
+    );
   };
 
   if (!defaultTimeStart || !defaultTimeEnd) return null;
+  if (items.length === 0 || groups.length === 0) return null;
+
 
   return (
     <div>
-      <button onClick={handleClick}>format</button>
-      <button onClick={handleClickChangeHeaders}>add headers</button>
       <Timeline
         groups={groups}
         items={items}
@@ -251,19 +236,11 @@ export default function App() {
         itemTouchSendsClick={false}
         stackItems
         itemHeightRatio={0.75}
+        itemRenderer={itemRenderer}
         defaultTimeStart={defaultTimeStart}
         defaultTimeEnd={defaultTimeEnd}
-        onCanvasClick={handleCanvasClick}
-        onCanvasDoubleClick={handleCanvasDoubleClick}
-        onCanvasContextMenu={handleCanvasContextMenu}
-        onItemClick={handleItemClick}
-        onItemSelect={handleItemSelect}
-        onItemContextMenu={handleItemContextMenu}
-        onItemMove={handleItemMove}
-        onItemResize={handleItemResize}
-        onItemDoubleClick={handleItemDoubleClick}
         onTimeChange={handleTimeChange}
-        // moveResizeValidator={moveResizeValidator}
+        onBoundsChange={handleBoundChange}
       >
         <TimelineHeaders className="header-background">
           <SidebarHeader />
@@ -272,125 +249,13 @@ export default function App() {
             unit="primaryHeader"
           />
           <DateHeader height={50} />
-          <CustomHeader unit="year" headerData={{ hey: "you" }}>
-            {({
-              headerContext: { intervals },
-              getRootProps,
-              getIntervalProps,
-              showPeriod,
-              data,
-            }) => {
-              console.log("props", data);
-              return (
-                <div {...getRootProps()}>
-                  {intervals.map((interval) => {
-                    const intervalStyle = {
-                      lineHeight: "30px",
-                      textAlign: "center",
-                      borderLeft: "1px solid black",
-                      cursor: "pointer",
-                      backgroundColor: "Turquoise",
-                      color: "white",
-                    };
-                    return (
-                      <div
-                        onClick={() => {
-                          showPeriod(interval.startTime, interval.endTime);
-                        }}
-                        {...getIntervalProps({
-                          interval,
-                          style: intervalStyle,
-                        })}
-                      >
-                        <div className="sticky">
-                          {interval.startTime.format("YYYY")}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            }}
-          </CustomHeader>
-          <CustomHeader unit="week">
-            {({
-              headerContext: { intervals },
-              getRootProps,
-              getIntervalProps,
-              showPeriod,
-            }) => {
-              return (
-                <div {...getRootProps()}>
-                  {intervals.map((interval) => {
-                    const intervalStyle = {
-                      lineHeight: "30px",
-                      textAlign: "center",
-                      borderLeft: "1px solid black",
-                      cursor: "pointer",
-                      backgroundColor: "indianred",
-                      color: "white",
-                    };
-                    return (
-                      <div
-                        onClick={() => {
-                          showPeriod(interval.startTime, interval.endTime);
-                        }}
-                        {...getIntervalProps({
-                          interval,
-                          style: intervalStyle,
-                        })}
-                      >
-                        <div className="sticky">
-                          {interval.startTime.format("MM/DD")}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            }}
-          </CustomHeader>
-          <CustomHeader>
-            {({
-              headerContext: { intervals },
-              getRootProps,
-              getIntervalProps,
-              showPeriod,
-            }) => {
-              return (
-                <div {...getRootProps()}>
-                  {intervals.map((interval) => {
-                    const intervalStyle = {
-                      lineHeight: "30px",
-                      textAlign: "center",
-                      borderLeft: "1px solid black",
-                      cursor: "pointer",
-                    };
-                    return (
-                      <div
-                        onClick={() => {
-                          showPeriod(interval.startTime, interval.endTime);
-                        }}
-                        {...getIntervalProps({
-                          interval,
-                          style: intervalStyle,
-                        })}
-                      >
-                        {interval.startTime.format("HH")}
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            }}
-          </CustomHeader>
           <DateHeader
             unit="week"
             labelFormat="MM/DD"
             height={50}
             headerData={{ hey: "date header" }}
             intervalRenderer={({ getIntervalProps, intervalContext, data }) => {
-              console.log("intervalRenderer props", data);
+              //   console.log("intervalRenderer props", data);
               return (
                 <div {...getIntervalProps()}>
                   {intervalContext.intervalText}
@@ -398,15 +263,6 @@ export default function App() {
               );
             }}
           />
-          {showHeaders
-            ? [
-                <DateHeader
-                  labelFormat={format ? "d" : undefined}
-                  unit="primaryHeader"
-                />,
-                <DateHeader height={50} />,
-              ]
-            : null}
         </TimelineHeaders>
         <TimelineMarkers>
           <TodayMarker />
@@ -418,7 +274,7 @@ export default function App() {
               1000 * 60 * 60 * 2
             }
           />
-          <CustomMarker
+          {/* <CustomMarker
             date={moment()
               .add(3, "day")
               .valueOf()}
@@ -427,7 +283,7 @@ export default function App() {
               const newStyles = { ...styles, backgroundColor: "blue" };
               return <div style={newStyles} />;
             }}
-          </CustomMarker>
+          </CustomMarker> */}
           <CursorMarker />
         </TimelineMarkers>
       </Timeline>
