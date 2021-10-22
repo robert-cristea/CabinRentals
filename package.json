@@ -1,0 +1,81 @@
+{
+  "name": "cabinrentals",
+  "version": "1.0.0",
+  "description": "booking master calendar timeline view property detail calendar",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.23.0",
+    "core-js": "^3.18.3",
+    "dotenv": "^10.0.0",
+    "moment": "^2.29.1",
+    "react": "^16.2.0",
+    "react-calendar-timeline": "^0.27.0",
+    "react-dom": "^16.2.0",
+    "react-router-dom": "^4.1.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.0",
+    "@babel/core": "^7.5.0",
+    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.2",
+    "@babel/preset-env": "^7.5.2",
+    "@babel/preset-react": "^7.0.0",
+    "babel-eslint": "^7.1.1",
+    "babel-jest": "^24.8.0",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-react-remove-properties": "^0.3.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "cross-env": "^5.1.4",
+    "css-loader": "~0.26.0",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
+    "eslint": "^4.16.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-plugin-jest": "^21.6.1",
+    "eslint-plugin-prettier": "^2.5.0",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-react": "^7.5.1",
+    "eslint-plugin-standard": "^2.0.1",
+    "faker": "^4.1.0",
+    "interactjs": "^1.3.4",
+    "jest": "^24.8.0",
+    "jest-dom": "^3.5.0",
+    "jest-watch-typeahead": "^0.3.1",
+    "jsdom": "^11.5.1",
+    "moment": "^2.11.1",
+    "node-sass": "^4.12.0",
+    "prettier": "^1.10.2",
+    "prettier-eslint-cli": "^4.7.0",
+    "prop-types": "^15.6.2",
+    "randomcolor": "^0.5.3",
+    "react-testing-library": "^6.0.3",
+    "regenerator-runtime": "^0.13.9",
+    "rimraf": "^2.6.2",
+    "sass-loader": "^7.0.3",
+    "style-loader": "~0.13.0",
+    "webpack": "^4.16.3",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5"
+  },
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack --progress",
+    "start": "webpack-dev-server --hot --host 0.0.0.0 --display-modules",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vietvulong/CabinRentals.git"
+  },
+  "keywords": [
+    "react",
+    "timelineview"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vietvulong/CabinRentals/issues"
+  },
+  "homepage": "https://github.com/vietvulong/CabinRentals#readme"
+}
