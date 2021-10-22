@@ -1,54 +1,58 @@
-const path = require('path')
+const path = require("path");
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5000;
 
 const config = {
-    devtool: 'cheap-eval-source-map',
-    context: path.join(__dirname, './demo'),
-    entry: {
-        // vendor: ['react', 'react-dom', 'faker', 'interactjs', 'moment'],
-        demo: [
-            // `webpack-dev-server/client?http://0.0.0.0:${port}`,
-            // 'webpack/hot/only-dev-server',
-            './index.js'
-        ]
+  devtool: "cheap-eval-source-map",
+  context: path.join(__dirname, "./calendar"),
+  entry: {
+    // vendor: ['react', 'react-dom', 'faker', 'interactjs', 'moment'],
+    calendar: [
+      // `webpack-dev-server/client?http://0.0.0.0:${port}`,
+      // 'webpack/hot/only-dev-server',
+      "./index.js",
+    ],
+  },
+  output: {
+    path: path.join(__dirname, "./js"),
+    publicPath: "",
+    chunkFilename: "[name].bundle.js",
+    filename: "[name].bundle.js",
+  },
+  mode: "development",
+  module: {
+    rules: [
+      {
+        test: /\.scss$/,
+        loader: "style-loader!css-loader!sass-loader",
+      },
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        loaders: ["babel-loader"],
+      },
+      {
+        test: /\.css$/,
+        // exclude: /node_modules/,       there is a css file in node_modules/react-dates
+        loaders: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        loaders: ["file-loader"],
+      },
+    ],
+  },
+  resolve: {
+    extensions: [".js", ".jsx"],
+    modules: [path.resolve("./calendar"), "node_modules"],
+    alias: {
+      "~": path.join(__dirname, "./calendar"),
     },
-    output: {
-        path: path.join(__dirname, './build'),
-        publicPath: '',
-        chunkFilename: '[name].bundle.js',
-        filename: '[name].bundle.js'
-    },
-    mode: 'development',
-    module: {
-        rules: [
-            {
-                test: /\.scss$/,
-                loader: 'style-loader!css-loader!sass-loader'
-            },
-            {
-                test: /\.(js|jsx)$/,
-                exclude: /node_modules/,
-                loaders: ['babel-loader']
-            },
-            {
-                test: /\.css$/,
-                // exclude: /node_modules/,       there is a css file in node_modules/react-dates
-                loaders: ["style-loader", "css-loader"]
-            },
-        ]
-    },
-    resolve: {
-        extensions: ['.js', '.jsx'],
-        modules: [path.resolve('./demo'), 'node_modules'],
-        alias: {
-            '~': path.join(__dirname, './demo'),
-        }
-    },
-    devServer: {
-        contentBase: './demo',
-        port
-    }
-}
+  },
+  devServer: {
+    contentBase: "./calendar",
+    port,
+  },
+};
 
-module.exports = config
+module.exports = config;

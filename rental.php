@@ -38,7 +38,7 @@ foreach ($array as $reservation) {
     <link rel="stylesheet" href="./assets/bootstrap-4.3.1/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="./assets/fontawesome-4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href='./assets/fullcalendar/main.css'/>
-    <link rel="stylesheet" href="./css/custom.css"/>
+    <link rel="stylesheet" href="./css/rental.css"/>
 </head>
 <body>
 <div class="container-fluid rental-calendar-block">
@@ -119,7 +119,7 @@ foreach ($array as $reservation) {
                 initialView: 'dayGridMonth',
                 initialDate: getInitialDate(i),
                 showNonCurrentDates: false,
-                eventBackgroundColor: '#e74c3c',
+                eventBackgroundColor: 'rgb(26, 111, 179)',
                 events: events,
                 // aspectRatio: 2,
                 contentHeight: "auto",

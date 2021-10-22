@@ -1,0 +1,96 @@
+/* Rental calendar block */
+
+.rental-calendar-block {
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.rental-calendar-block h2,
+.rental-calendar-block h5 {
+  margin-bottom: 50px;
+
+  text-align: center;
+}
+
+.rental-calendar-block .rental-calendar-wrapper {
+  margin-bottom: 50px;
+}
+
+/* date cell height*/
+.fc-daygrid-day .fc-daygrid-day-top {
+  line-height: 1.2;
+}
+
+.fc-daygrid-day .fc-daygrid-day-events {
+  min-height: 1em !important;
+}
+
+.fc-daygrid-day .fc-daygrid-day-bg {
+  line-height: 1.2;
+}
+
+/* date */
+.fc-daygrid-day-number .fc-event-start {
+  /*background-color: yellow !important;*/
+}
+
+.fc-daygrid-day-number .fc-day-span-past {
+  /*background-color: yellow;*/
+}
+
+.fc-daygrid-day-number .fc-day-span-booked {
+  /*background-color: red;*/
+}
+
+.fc-day-checkin {
+  position: relative;
+  /*background: linear-gradient(to left top, transparent 50%, #e74c3c 50%);*/
+}
+
+/* background event style */
+.fc-bg-event {
+  opacity: 1 !important;
+}
+
+.fc-day-checkin::before {
+  position: absolute;
+  content: "";
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 30%;
+  /*background-color: #e74c3c;*/
+  background-color: rgb(26, 111, 179);
+  border-radius: 500px 0 0 500px;
+
+  /*top: 0;*/
+  /*right: 0;*/
+  /*width: 0;*/
+  /*height: 0;*/
+  /*border-bottom: 62px solid #e74c3c; !* cell height *!*/
+  /*border-left: 50px solid transparent;*/
+}
+
+.fc-day-checkout {
+  position: relative;
+  /*background: linear-gradient(to left top, transparent 50%, #e74c3c 50%);*/
+}
+
+.fc-day-checkout::after {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 30%;
+  /*background-color: #e74c3c;*/
+  border-radius: 0 500px 500px 0;
+  background-color: rgb(26, 111, 179);
+
+  /*top: 0;*/
+  /*left: 0;*/
+  /*width: 0;*/
+  /*height: 0;*/
+  /*border-top: 62px solid #e74c3c; !* cell height *!*/
+  /*border-right: 50px solid transparent;*/
+}
