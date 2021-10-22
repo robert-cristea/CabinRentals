@@ -52,33 +52,18 @@ export default function Timelineview({ isMobile }) {
   const [format, setFormat] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  //   const location = useLocation();
-
-  // useEffect(() => {
-  //   setDefaultTimeStart(defaultTimeStartValue);
-  //   setDefaultTimeEnd(defaultTimeEndValue);
-  //   setVisibleTimeStart(defaultTimeStartValue);
-  //   setVisibleTimeEnd(defaultTimeEndValue);
-  //   fetchRentals();
-  //   fetchReservation();
-  // }, []);
-
   useEffect(() => {
     console.log(`isMobile`, isMobile);
     let startValue, endValue;
-    startValue = moment()
-      .startOf("day")
-      .toDate();
+    startValue = moment().startOf("day");
     if (isMobile) {
       endValue = moment()
         .startOf("day")
-        .add(1, "week")
-        .toDate();
+        .add(1, "week");
     } else {
       endValue = moment()
         .startOf("day")
-        .add(1, "month")
-        .toDate();
+        .add(1, "month");
     }
     setDefaultTimeStart(startValue);
     setDefaultTimeEnd(endValue);
@@ -88,14 +73,14 @@ export default function Timelineview({ isMobile }) {
     fetchReservation();
   }, [isMobile]);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    let defaultTimeStart = params.get("start");
-    let defaultTimeEnd = params.get("end");
-    console.log(`location`, defaultTimeStart, defaultTimeEnd);
+  // useEffect(() => {
+  //   const params = new URLSearchParams(window.location.search);
+  //   let defaultTimeStart = params.get("start");
+  //   let defaultTimeEnd = params.get("end");
+  //   console.log(`location`, defaultTimeStart, defaultTimeEnd);
 
-    // fetchReservation();
-  }, [window.location]);
+  //   // fetchReservation();
+  // }, [window.location]);
 
   const fetchRentals = async () => {
     setIsLoading(true);
@@ -129,7 +114,11 @@ export default function Timelineview({ isMobile }) {
           .startOf("day")
           .add(2, "month")
           .format();
+      } else {
+        startDate = startDate.startOf("day").format();
+        endDate = endDate.startOf("day").format();
       }
+      console.log(`fetchReservation`, startDate, endDate);
       const { data: reservations } = await axios.get(
         `${API_URL}/cabinrentals/api/get-reservations.php?start=${startDate}&end=${endDate}`
       );
@@ -168,6 +157,56 @@ export default function Timelineview({ isMobile }) {
     return moment(date).add(9, "h");
   };
 
+  const handleLeftClick = () => {
+    let newVisibleTimeStart = moment(visibleTimeStart).add(-1, "month");
+    console.log(`handleLeftClick:newVisibleTimeStart`, newVisibleTimeStart);
+
+    let startDate = moment(newVisibleTimeStart).add(-1, "month");
+    let endDate = moment(newVisibleTimeStart).add(2, "month");
+
+    setDefaultTimeStart(moment(newVisibleTimeStart));
+    setDefaultTimeEnd(
+      moment(newVisibleTimeStart)
+        .startOf("day")
+        .add(1, "month")
+    );
+
+    setVisibleTimeStart(moment(newVisibleTimeStart));
+    setVisibleTimeEnd(
+      moment(newVisibleTimeStart)
+        .startOf("day")
+        .add(1, "month")
+    );
+    console.log(`handleLeftClick:startDate, endDate`, startDate, endDate);
+
+    fetchReservation(startDate, endDate);
+  };
+
+  const handleRightClick = () => {
+    let newVisibleTimeStart = moment(visibleTimeStart).add(1, "month");
+    console.log(`handleRightClick:newVisibleTimeStart`, newVisibleTimeStart);
+
+    let startDate = moment(newVisibleTimeStart).add(-1, "month");
+    let endDate = moment(newVisibleTimeStart).add(2, "month");
+
+    setDefaultTimeStart(moment(newVisibleTimeStart));
+    setDefaultTimeEnd(
+      moment(newVisibleTimeStart)
+        .startOf("day")
+        .add(1, "month")
+    );
+
+    setVisibleTimeStart(moment(newVisibleTimeStart));
+    setVisibleTimeEnd(
+      moment(newVisibleTimeStart)
+        .startOf("day")
+        .add(1, "month")
+    );
+    console.log(`handleRightClick:startDate, endDate`, startDate, endDate);
+
+    fetchReservation(startDate, endDate);
+  };
+
   // this limits the timeline to -6 months ... +6 months
   const handleTimeChange = (
     visibleTimeStart,
@@ -181,8 +220,12 @@ export default function Timelineview({ isMobile }) {
       moment(visibleTimeStart),
       moment(visibleTimeEnd)
     );
-    setVisibleTimeStart(visibleTimeStart);
-    setVisibleTimeEnd(visibleTimeEnd);
+
+    /**
+     * scroll
+     */
+    // setVisibleTimeStart(visibleTimeStart);
+    // setVisibleTimeEnd(visibleTimeEnd);
 
     if (visibleTimeStart < minTime && visibleTimeEnd > maxTime) {
       updateScrollCanvas(minTime, maxTime);
@@ -253,13 +296,13 @@ export default function Timelineview({ isMobile }) {
       <div className="calendar">
         <div className="calendar__action">
           <div className="calendar__navigator">
-            <div>
+            <div onClick={handleLeftClick}>
               <FaChevronLeft />
             </div>
             <div>
               <FaCalendar />
             </div>
-            <div>
+            <div onClick={handleRightClick}>
               <FaChevronRight />
             </div>
           </div>
@@ -294,6 +337,8 @@ export default function Timelineview({ isMobile }) {
           itemRenderer={itemRenderer}
           defaultTimeStart={defaultTimeStart}
           defaultTimeEnd={defaultTimeEnd}
+          visibleTimeStart={visibleTimeStart}
+          visibleTimeEnd={visibleTimeEnd}
           onTimeChange={handleTimeChange}
           onBoundsChange={handleBoundChange}
         >
