@@ -1,4 +1,5 @@
 const path = require("path");
+const Dotenv = require('dotenv-webpack');
 
 const port = process.env.PORT || 5000;
 
@@ -53,6 +54,9 @@ const config = {
     contentBase: "./calendar",
     port,
   },
+  plugins: [
+    new Dotenv()
+  ]
 };
 
 module.exports = config;

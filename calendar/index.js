@@ -6,18 +6,17 @@ import App from "./app";
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 
-// require("dotenv").config();
 
 const render = (AppToRender) => {
-  ReactDOM.render(<AppToRender />, document.getElementById("root"));
+    ReactDOM.render(<AppToRender/>, document.getElementById("root"));
 };
 
 render(App);
 
 if (module.hot) {
-  module.hot.accept("./app", () => {
-    const NextApp = require("./app").default;
+    module.hot.accept("./app", () => {
+        const NextApp = require("./app").default;
 
-    render(NextApp);
-  });
+        render(NextApp);
+    });
 }
