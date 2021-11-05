@@ -48,32 +48,32 @@ foreach ($array as $reservation) {
         <h5><?php echo $rental->getPropertyTitle(); ?></h5>
 
         <div class="row">
-            <div class="col-lg-4 col-sm-12">
+            <div class="col-lg-4 col-md-6 col-sm-12">
                 <div id="rental-calendar1" class="rental-calendar-wrapper">
 
                 </div>
             </div>
-            <div class="col-lg-4 col-sm-12">
+            <div class="col-lg-4 col-md-6 col-sm-12">
                 <div id="rental-calendar2" class="rental-calendar-wrapper">
 
                 </div>
             </div>
-            <div class="col-lg-4 col-sm-12">
+            <div class="col-lg-4 col-md-6 col-sm-12">
                 <div id="rental-calendar3" class="rental-calendar-wrapper">
 
                 </div>
             </div>
-            <div class="col-lg-4 col-sm-12">
+            <div class="col-lg-4 col-md-6 col-sm-12">
                 <div id="rental-calendar4" class="rental-calendar-wrapper">
 
                 </div>
             </div>
-            <div class="col-lg-4 col-sm-12">
+            <div class="col-lg-4 col-md-6 col-sm-12">
                 <div id="rental-calendar5" class="rental-calendar-wrapper">
 
                 </div>
             </div>
-            <div class="col-lg-4 col-sm-12">
+            <div class="col-lg-4 col-md-6 col-sm-12">
                 <div id="rental-calendar6" class="rental-calendar-wrapper">
 
                 </div>
