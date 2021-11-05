@@ -1,96 +1,138 @@
 /* Rental calendar block */
 
 .rental-calendar-block {
-  padding-top: 50px;
-  padding-bottom: 50px;
+    padding-top: 50px;
+    padding-bottom: 50px;
 }
 
 .rental-calendar-block h2,
 .rental-calendar-block h5 {
-  margin-bottom: 50px;
+    margin-bottom: 50px;
 
-  text-align: center;
+    text-align: center;
 }
 
 .rental-calendar-block .rental-calendar-wrapper {
-  margin-bottom: 50px;
+    margin-bottom: 50px;
 }
 
 /* date cell height*/
 .fc-daygrid-day .fc-daygrid-day-top {
-  line-height: 1.2;
+    line-height: 1.2;
 }
 
 .fc-daygrid-day .fc-daygrid-day-events {
-  min-height: 1em !important;
+    min-height: 1em !important;
 }
 
 .fc-daygrid-day .fc-daygrid-day-bg {
-  line-height: 1.2;
+    line-height: 1.2;
 }
 
 /* date */
 .fc-daygrid-day-number .fc-event-start {
-  /*background-color: yellow !important;*/
+    /*background-color: yellow !important;*/
 }
 
 .fc-daygrid-day-number .fc-day-span-past {
-  /*background-color: yellow;*/
+    /*background-color: yellow;*/
 }
 
 .fc-daygrid-day-number .fc-day-span-booked {
-  /*background-color: red;*/
+    /*background-color: red;*/
+}
+
+/* Calendar row height*/
+.fc-daygrid-day-frame {
+    height: 60px;
 }
 
 .fc-day-checkin {
-  position: relative;
-  /*background: linear-gradient(to left top, transparent 50%, #e74c3c 50%);*/
+    position: relative;
+    /*background: linear-gradient(to left top, transparent 50%, #e74c3c 50%);*/
 }
 
 /* background event style */
 .fc-bg-event {
-  opacity: 1 !important;
+    opacity: 1 !important;
 }
 
 .fc-day-checkin::before {
+    /*background-color: rgb(26, 111, 179);*/
+    /*border-radius: 500px 0 0 500px;*/
 
-  /*top: 0;*/
-  /*right: 0;*/
-  /*bottom: 0;*/
-  /*width: 30%;*/
-  /*background-color: rgb(26, 111, 179);*/
-  /*border-radius: 500px 0 0 500px;*/
-
-  position: absolute;
-  content: "";
-  top: 0;
-  right: 0;
-  width: 0;
-  height: 0;
-  border-bottom: 60px solid rgb(26, 111, 179); /* cell height */
-  border-left: 20px solid transparent;
+    position: absolute;
+    content: "";
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-bottom: 60px solid rgb(26, 111, 179); /* slant cell height */
+    border-left: 20px solid transparent;
 }
 
 .fc-day-checkout {
-  position: relative;
-  /*background: linear-gradient(to left top, transparent 50%, #e74c3c 50%);*/
+    position: relative;
+    /*background: linear-gradient(to left top, transparent 50%, #e74c3c 50%);*/
 }
 
 .fc-day-checkout::after {
+    /*border-radius: 0 500px 500px 0;*/
+    /*background-color: rgb(26, 111, 179);*/
 
-  /*top: 0;*/
-  /*left: 0;*/
-  /*bottom: 0;*/
-  /*width: 30%;*/
-  /*border-radius: 0 500px 500px 0;*/
-  /*background-color: rgb(26, 111, 179);*/
+    position: absolute;
+    content: "";
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-top: 60px solid rgb(26, 111, 179); /* slant cell height */
+    border-right: 20px solid transparent;
+}
 
-  position: absolute;
-  content: "";
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-  border-top: 60px solid rgb(26, 111, 179); /* cell height */
-  border-right: 20px solid transparent;
+@media screen  and (max-width: 992px) {
+    .fc-daygrid-day-frame {
+        height: 50px;
+    }
+
+    .fc-day-checkin::before {
+        border-bottom: 50px solid rgb(26, 111, 179); /* slant cell height */
+        border-left: 20px solid transparent;
+    }
+
+    .fc-day-checkout::after {
+        border-top: 50px solid rgb(26, 111, 179); /* slant cell height */
+        border-right: 20px solid transparent;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .fc-daygrid-day-frame {
+        height: 60px;
+    }
+    .fc-day-checkin::before {
+        border-bottom: 60px solid rgb(26, 111, 179); /* slant cell height */
+        border-left: 20px solid transparent;
+    }
+
+    .fc-day-checkout::after {
+        border-top: 60px solid rgb(26, 111, 179); /* slant cell height */
+        border-right: 20px solid transparent;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .fc-daygrid-day-frame {
+        height: 50px;
+    }
+
+    .fc-day-checkin::before {
+        border-bottom: 50px solid rgb(26, 111, 179); /* slant cell height */
+        border-left: 20px solid transparent;
+    }
+
+    .fc-day-checkout::after {
+        border-top: 50px solid rgb(26, 111, 179); /* slant cell height */
+        border-right: 20px solid transparent;
+    }
 }
